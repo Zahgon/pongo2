@@ -56,7 +56,7 @@ func (node *tagIfchangedNode) Execute(ctx *ExecutionContext, writer TemplateWrit
 			if err != nil {
 				return err
 			}
-		} else {
+		} else if node.elseWrapper != nil {
 			// Render elseWrapper
 			err := node.elseWrapper.Execute(ctx, writer)
 			if err != nil {
