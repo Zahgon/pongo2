@@ -42,12 +42,16 @@ type TemplateSet struct {
 	// You can change the options before calling the Execute method.
 	Options *Options
 
-	// Sandbox features
-	// - Disallow access to specific tags and/or filters (using BanTag() and BanFilter())
+	// Banned tags/filters
+	// - Disallow specific tags and/or filters (using BanTag() and BanFilter())
+	//
+	// NOTE: This is not a real sandbox. It does not isolate Go execution,
+	// restrict filesystem access, or contain malicious templates. It only
+	// refuses to compile templates that reference banned tag/filter names.
 	//
 	// For efficiency reasons you can ban tags/filters only *before* you have
 	// added your first template to the set (restrictions are statically checked).
-	// After you added one, it's not possible anymore (for your personal security).
+	// After you added one, it's not possible anymore.
 	firstTemplateCreated bool
 	bannedTags           map[string]bool
 	bannedFilters        map[string]bool
@@ -284,7 +288,7 @@ var (
 	debug  bool // internal debugging
 	logger = log.New(os.Stdout, "[pongo2] ", log.LstdFlags|log.Lshortfile)
 
-	// DefaultLoader allows the default un-sandboxed access to the local file
+	// DefaultLoader allows the default unrestricted access to the local file
 	// system and is being used by the DefaultSet.
 	DefaultLoader = MustNewLocalFileSystemLoader("")
 

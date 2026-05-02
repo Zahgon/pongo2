@@ -69,7 +69,7 @@ Please use the [issue tracker](https://github.com/flosch/pongo2/issues) if you'r
 - [Easy API to create new filters and tags](http://godoc.org/github.com/flosch/pongo2#RegisterFilter) ([including parsing arguments](http://godoc.org/github.com/flosch/pongo2#Parser))
 - Additional features:
   - Macros including importing macros from other files (see [template_tests/macro.tpl](https://github.com/flosch/pongo2/blob/master/template_tests/macro.tpl))
-  - [Template sandboxing](https://godoc.org/github.com/flosch/pongo2#TemplateSet) ([directory patterns](http://golang.org/pkg/path/filepath/#Match), banned tags/filters)
+  - Restrict the template surface by banning specific tags and/or filters per [`TemplateSet`](https://godoc.org/github.com/flosch/pongo2#TemplateSet) (note: this is **not** a real sandbox — it does not isolate Go execution, restrict filesystem access, or contain malicious templates; it only refuses to compile templates that use the banned names)
 
 ## Caveats
 
