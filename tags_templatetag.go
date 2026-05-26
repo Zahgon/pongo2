@@ -54,30 +54,15 @@ var templateTagMapping = map[string]string{
 
 // Execute outputs the literal template syntax string (e.g., "{{" or "%}").
 func (node *tagTemplateTagNode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	_, err := writer.WriteString(node.content)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // tagTemplateTagParser parses the {% templatetag %} tag. It requires one
 // identifier argument from the templateTagMapping (e.g., "openblock").
 func tagTemplateTagParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	ttNode := &tagTemplateTagNode{}
-
-	if argToken := arguments.MatchType(TokenIdentifier); argToken != nil {
-		output, found := templateTagMapping[argToken.Val]
-		if !found {
-			return nil, arguments.Error("Argument not found", argToken)
-		}
-		ttNode.content = output
-	} else {
-		return nil, arguments.Error("Identifier expected.", nil)
-	}
-
-	if arguments.Remaining() > 0 {
-		return nil, arguments.Error("Malformed templatetag-tag argument.", nil)
-	}
-
-	return ttNode, nil
+	_ = "STUB: not implemented"
+	return *new(INodeTag), nil
 }
 
 func init() {

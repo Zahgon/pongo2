@@ -1,9 +1,7 @@
 package pongo2
 
 import (
-	"bytes"
 	"regexp"
-	"strings"
 )
 
 // tagSpacelessNode represents the {% spaceless %} tag.
@@ -54,45 +52,22 @@ var tagSpacelessRegexp = regexp.MustCompile(`(?U:(<.*>))([\t\n\v\f\r ]+)(?U:(<.*
 // Execute renders the block content and removes whitespace between HTML tags.
 // The removal is applied recursively until no more whitespace can be removed.
 func (node *tagSpacelessNode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	b := bytes.NewBuffer(make([]byte, 0, 1024)) // 1 KiB
-
-	err := node.wrapper.Execute(ctx, b)
-	if err != nil {
-		return err
-	}
-
-	// Django strips leading/trailing whitespace from the block before
-	// removing whitespace between tags.
-	s := strings.TrimSpace(b.String())
-
-	// Repeat this recursively
-	changed := true
-	for changed {
-		s2 := tagSpacelessRegexp.ReplaceAllString(s, "$1$3")
-		changed = s != s2
-		s = s2
-	}
-
-	_, err = writer.WriteString(s)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// 1 KiB
+
+// Django strips leading/trailing whitespace from the block before
+// removing whitespace between tags.
+
+// Repeat this recursively
 
 // tagSpacelessParser parses the {% spaceless %} tag. It takes no arguments
 // and wraps content until {% endspaceless %}.
 func tagSpacelessParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	spacelessNode := &tagSpacelessNode{}
-
-	wrapper, _, err := doc.WrapUntilTag("endspaceless")
-	if err != nil {
-		return nil, err
-	}
-	spacelessNode.wrapper = wrapper
-
-	if arguments.Remaining() > 0 {
-		return nil, arguments.Error("Malformed spaceless-tag arguments.", nil)
-	}
-
-	return spacelessNode, nil
+	_ = "STUB: not implemented"
+	return *new(INodeTag), nil
 }
 
 func init() {

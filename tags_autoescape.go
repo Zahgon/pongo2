@@ -32,42 +32,15 @@ type tagAutoescapeNode struct {
 // It temporarily changes the autoescape state in the context, executes the
 // wrapped content, and restores the original autoescape state afterward.
 func (node *tagAutoescapeNode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	old := ctx.Autoescape
-	ctx.Autoescape = node.autoescape
-	defer func() { ctx.Autoescape = old }()
-
-	return node.wrapper.Execute(ctx, writer)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // tagAutoescapeParser parses the {% autoescape %} tag.
 // It expects a single argument "on" or "off" to control HTML escaping.
 func tagAutoescapeParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	autoescapeNode := &tagAutoescapeNode{}
-
-	wrapper, _, err := doc.WrapUntilTag("endautoescape")
-	if err != nil {
-		return nil, err
-	}
-	autoescapeNode.wrapper = wrapper
-
-	modeToken := arguments.MatchType(TokenIdentifier)
-	if modeToken == nil {
-		return nil, arguments.Error("A mode is required for autoescape-tag.", nil)
-	}
-	switch modeToken.Val {
-	case "on":
-		autoescapeNode.autoescape = true
-	case "off":
-		autoescapeNode.autoescape = false
-	default:
-		return nil, arguments.Error("Only 'on' or 'off' is valid as an autoescape-mode.", nil)
-	}
-
-	if arguments.Remaining() > 0 {
-		return nil, arguments.Error("Malformed autoescape-tag arguments.", nil)
-	}
-
-	return autoescapeNode, nil
+	_ = "STUB: not implemented"
+	return *new(INodeTag), nil
 }
 
 func init() {

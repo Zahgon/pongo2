@@ -1,9 +1,5 @@
 package pongo2
 
-import (
-	"strings"
-)
-
 type nodeHTML struct {
 	token     *Token
 	trimLeft  bool
@@ -11,13 +7,6 @@ type nodeHTML struct {
 }
 
 func (n *nodeHTML) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	res := n.token.Val
-	if n.trimLeft {
-		res = strings.TrimLeft(res, tokenSpaceChars)
-	}
-	if n.trimRight {
-		res = strings.TrimRight(res, tokenSpaceChars)
-	}
-	_, err := writer.WriteString(res)
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }

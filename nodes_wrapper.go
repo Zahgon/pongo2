@@ -6,11 +6,6 @@ type NodeWrapper struct {
 }
 
 func (wrapper *NodeWrapper) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	for _, n := range wrapper.nodes {
-		err := n.Execute(ctx, writer)
-		if err != nil {
-			return err
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }

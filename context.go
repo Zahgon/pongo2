@@ -1,11 +1,5 @@
 package pongo2
 
-import (
-	"errors"
-	"fmt"
-	"maps"
-)
-
 // A Context type provides constants, variables, instances or functions to a template.
 //
 // pongo2 automatically provides meta-information or functions through the "pongo2"-key.
@@ -20,42 +14,14 @@ import (
 //	{{ pongo2.version }}
 type Context map[string]any
 
-func (c Context) checkForValidIdentifiers() error {
-	for k, v := range c {
-		if !isValidIdentifier(k) {
-			return &Error{
-				Sender:    "checkForValidIdentifiers",
-				OrigError: fmt.Errorf("context-key '%s' (value: '%+v') is not a valid identifier", k, v),
-			}
-		}
-	}
-	return nil
-}
+func (c Context) checkForValidIdentifiers() error { _ = "STUB: not implemented"; return nil }
 
-func isValidIdentifier(s string) bool {
-	if len(s) == 0 {
-		return false
-	}
-	for i := range s {
-		if !isValidIdentifierChar(s[i]) {
-			return false
-		}
-	}
-	return true
-}
+func isValidIdentifier(s string) bool { _ = "STUB: not implemented"; return false }
 
-func isValidIdentifierChar(c byte) bool {
-	return (c >= 'a' && c <= 'z') ||
-		(c >= 'A' && c <= 'Z') ||
-		(c >= '0' && c <= '9') ||
-		c == '_'
-}
+func isValidIdentifierChar(c byte) bool { _ = "STUB: not implemented"; return false }
 
 // Update updates this context with the key/value-pairs from another context.
-func (c Context) Update(other Context) Context {
-	maps.Copy(c, other)
-	return c
-}
+func (c Context) Update(other Context) Context { _ = "STUB: not implemented"; return *new(Context) }
 
 // ExecutionContext holds the runtime state during template rendering.
 //
@@ -102,20 +68,10 @@ var pongo2MetaContext = Context{
 }
 
 func newExecutionContext(tpl *Template, ctx Context) *ExecutionContext {
-	privateCtx := make(Context)
+	_ = "STUB: not implemented"
+	return nil
 
 	// Make the pongo2-related funcs/vars available to the context
-	privateCtx["pongo2"] = pongo2MetaContext
-
-	return &ExecutionContext{
-		template: tpl,
-
-		Public:     ctx,
-		Private:    privateCtx,
-		Shared:     make(Context),
-		Autoescape: tpl.set.autoescape,
-		tagState:   make(map[any]any),
-	}
 }
 
 // NewChildExecutionContext creates a new execution context that inherits from
@@ -124,47 +80,23 @@ func newExecutionContext(tpl *Template, ctx Context) *ExecutionContext {
 // copies of the parent's private data). This is useful for custom tags that need
 // to create isolated scopes while maintaining access to the template's data.
 func NewChildExecutionContext(parent *ExecutionContext) *ExecutionContext {
-	newctx := &ExecutionContext{
-		template: parent.template,
-
-		Public:     parent.Public,
-		Private:    make(Context),
-		Autoescape: parent.Autoescape,
-		tagState:   parent.tagState,
-	}
-	newctx.Shared = parent.Shared
-
-	// Copy all existing private items
-	newctx.Private.Update(parent.Private)
-
-	return newctx
+	_ = "STUB: not implemented"
+	return nil
 }
 
+// Copy all existing private items
+
 func (ctx *ExecutionContext) Error(msg string, token *Token) error {
-	return ctx.OrigError(errors.New(msg), token)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (ctx *ExecutionContext) OrigError(err error, token *Token) error {
-	filename := ctx.template.name
-	var line, col int
-	if token != nil {
-		// No tokens available
-		// TODO: Add location (from where?)
-		filename = token.Filename
-		line = token.Line
-		col = token.Col
-	}
-	return &Error{
-		Template:  ctx.template,
-		Filename:  filename,
-		Line:      line,
-		Column:    col,
-		Token:     token,
-		Sender:    "execution",
-		OrigError: err,
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (ctx *ExecutionContext) Logf(format string, args ...any) {
-	ctx.template.set.logf(format, args...)
-}
+// No tokens available
+// TODO: Add location (from where?)
+
+func (ctx *ExecutionContext) Logf(format string, args ...any) { _ = "STUB: not implemented"; return }

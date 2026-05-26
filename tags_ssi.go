@@ -1,7 +1,5 @@
 package pongo2
 
-import "io"
-
 // tagSSINode represents the {% ssi %} tag.
 //
 // DEPRECATED: This tag was removed from Django in version 1.10.
@@ -35,72 +33,24 @@ type tagSSINode struct {
 // Execute outputs the file content. If "parsed" was specified, the content
 // is executed as a template with the current context; otherwise it's output as-is.
 func (node *tagSSINode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	if node.template != nil {
-		// Execute the template within the current context
-		includeCtx := make(Context)
-		includeCtx.Update(ctx.Public)
-		includeCtx.Update(ctx.Private)
-
-		err := node.template.execute(includeCtx, writer)
-		if err != nil {
-			return err
-		}
-	} else {
-		// Just print out the content
-		_, err := writer.WriteString(node.content)
-		return err
-	}
+	_ = "STUB: not implemented"
 	return nil
+
+	// Execute the template within the current context
 }
+
+// Just print out the content
 
 // tagSSIParser parses the {% ssi %} tag. It requires a filename string and
 // optionally accepts "parsed" to treat the file as a template.
 func tagSSIParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	SSINode := &tagSSINode{}
-
-	if fileToken := arguments.MatchType(TokenString); fileToken != nil {
-		SSINode.filename = fileToken.Val
-
-		if arguments.Match(TokenIdentifier, "parsed") != nil {
-			// parsed
-			temporaryTpl, err := doc.template.set.FromFile(doc.template.set.resolveFilename(doc.template, fileToken.Val))
-			if err != nil {
-				return nil, updateErrorToken(err, doc.template, fileToken)
-			}
-			SSINode.template = temporaryTpl
-		} else {
-			// plaintext - use the template loader to support virtual filesystems
-			_, _, fd, err := doc.template.set.resolveTemplate(doc.template, fileToken.Val)
-			if err != nil {
-				return nil, updateErrorToken(&Error{
-					Sender:    "tag:ssi",
-					OrigError: err,
-				}, doc.template, fileToken)
-			}
-			buf, err := io.ReadAll(fd)
-			if closer, ok := fd.(io.Closer); ok {
-				if closeErr := closer.Close(); closeErr != nil && err == nil {
-					err = closeErr
-				}
-			}
-			if err != nil {
-				return nil, updateErrorToken(&Error{
-					Sender:    "tag:ssi",
-					OrigError: err,
-				}, doc.template, fileToken)
-			}
-			SSINode.content = string(buf)
-		}
-	} else {
-		return nil, arguments.Error("First argument must be a string.", nil)
-	}
-
-	if arguments.Remaining() > 0 {
-		return nil, arguments.Error("Malformed SSI-tag argument.", nil)
-	}
-
-	return SSINode, nil
+	_ = "STUB: not implemented"
+	return *new(INodeTag), nil
 }
+
+// parsed
+
+// plaintext - use the template loader to support virtual filesystems
 
 func init() {
 	mustRegisterTag("ssi", tagSSIParser)

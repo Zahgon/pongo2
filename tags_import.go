@@ -1,9 +1,5 @@
 package pongo2
 
-import (
-	"fmt"
-)
-
 // tagImportNode represents the {% import %} tag.
 //
 // The import tag imports macros from another template file, making them
@@ -44,75 +40,18 @@ type tagImportNode struct {
 // Execute registers imported macros as callable functions in the private context.
 // Each macro becomes available under its name (or alias) as a function.
 func (node *tagImportNode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	for name, macro := range node.macros {
-		func(name string, macro *tagMacroNode) {
-			ctx.Private[name] = func(args ...*Value) (*Value, error) {
-				return macro.call(ctx, args...)
-			}
-		}(name, macro)
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // tagImportParser parses the {% import %} tag. It requires a filename string
 // followed by one or more macro names to import, with optional "as" aliases.
 func tagImportParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	importNode := &tagImportNode{
-		position: start,
-		macros:   make(map[string]*tagMacroNode),
-	}
-
-	filenameToken := arguments.MatchType(TokenString)
-	if filenameToken == nil {
-		return nil, arguments.Error("Import-tag needs a filename as string.", nil)
-	}
-
-	importNode.filename = doc.template.set.resolveFilename(doc.template, filenameToken.Val)
-
-	if arguments.Remaining() == 0 {
-		return nil, arguments.Error("You must at least specify one macro to import.", nil)
-	}
-
-	// Compile the given template
-	tpl, err := doc.template.set.FromFile(importNode.filename)
-	if err != nil {
-		return nil, updateErrorToken(err, doc.template, start)
-	}
-
-	for arguments.Remaining() > 0 {
-		macroNameToken := arguments.MatchType(TokenIdentifier)
-		if macroNameToken == nil {
-			return nil, arguments.Error("Expected macro name (identifier).", nil)
-		}
-
-		asName := macroNameToken.Val
-		if arguments.Match(TokenKeyword, "as") != nil {
-			aliasToken := arguments.MatchType(TokenIdentifier)
-			if aliasToken == nil {
-				return nil, arguments.Error("Expected macro alias name (identifier).", nil)
-			}
-			asName = aliasToken.Val
-		}
-
-		macroInstance, has := tpl.exportedMacros[macroNameToken.Val]
-		if !has {
-			return nil, arguments.Error(fmt.Sprintf("Macro '%s' not found (or not exported) in '%s'.", macroNameToken.Val,
-				importNode.filename), macroNameToken)
-		}
-
-		importNode.macros[asName] = macroInstance
-
-		if arguments.Remaining() == 0 {
-			break
-		}
-
-		if arguments.Match(TokenSymbol, ",") == nil {
-			return nil, arguments.Error("Expected ','.", nil)
-		}
-	}
-
-	return importNode, nil
+	_ = "STUB: not implemented"
+	return *new(INodeTag), nil
 }
+
+// Compile the given template
 
 func init() {
 	mustRegisterTag("import", tagImportParser)

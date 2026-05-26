@@ -19,11 +19,6 @@ package pongo2
    url (reason: web-framework specific)
 */
 
-import (
-	"fmt"
-	"maps"
-)
-
 // INodeTag is a semantic interface for template tags returned by TagParser functions.
 // While structurally identical to INode, it provides API clarity and future extensibility.
 //
@@ -55,75 +50,36 @@ type tag struct {
 var builtinTags = make(map[string]*tag)
 
 // copyTags creates a shallow copy of a tag map.
-func copyTags(src map[string]*tag) map[string]*tag {
-	dst := make(map[string]*tag, len(src))
-	maps.Copy(dst, src)
-	return dst
-}
+func copyTags(src map[string]*tag) map[string]*tag { _ = "STUB: not implemented"; return nil }
 
-func mustRegisterTag(name string, parserFn TagParser) {
-	if err := registerTagGlobal(name, parserFn); err != nil {
-		panic(err)
-	}
-}
+func mustRegisterTag(name string, parserFn TagParser) { _ = "STUB: not implemented"; return }
 
 // registerTagGlobal registers a new tag to the global tag map.
 // This is used during package initialization to register builtin tags.
 func registerTagGlobal(name string, parserFn TagParser) error {
-	_, existing := builtinTags[name]
-	if existing {
-		return fmt.Errorf("tag with name '%s' is already registered", name)
-	}
-	builtinTags[name] = &tag{
-		name:   name,
-		parser: parserFn,
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Tag = "{%" IDENT ARGS "%}"
 func (p *Parser) parseTagElement() (INodeTag, error) {
-	p.Consume() // consume "{%"
-	tokenName := p.MatchType(TokenIdentifier)
-
-	// Check for identifier
-	if tokenName == nil {
-		return nil, p.Error("Tag name must be an identifier.", nil)
-	}
-
-	// Check sandbox tag restriction
-	if _, isBanned := p.template.set.bannedTags[tokenName.Val]; isBanned {
-		return nil, p.Error(fmt.Sprintf("Usage of tag '%s' is not allowed (sandbox restriction active).", tokenName.Val), tokenName)
-	}
-
-	// Check for the existing tag
-	tag, exists := p.template.set.tags[tokenName.Val]
-	if !exists {
-		// Does not exists
-		return nil, p.Error(fmt.Sprintf("Tag '%s' not found (or beginning tag not provided)", tokenName.Val), tokenName)
-	}
-
-	var argsToken []*Token
-	for p.Peek(TokenSymbol, "%}") == nil && p.Remaining() > 0 {
-		// Add token to args
-		argsToken = append(argsToken, p.Current())
-		p.Consume() // next token
-	}
-
-	// EOF?
-	if p.Remaining() == 0 {
-		return nil, p.Error("Unexpectedly reached EOF, no tag end found.", p.lastToken)
-	}
-
-	p.Match(TokenSymbol, "%}")
-
-	argParser := newParser(p.name, argsToken, p.template)
-	if len(argsToken) == 0 {
-		// This is done to have nice EOF error messages
-		argParser.lastToken = tokenName
-	}
-
-	p.template.level++
-	defer func() { p.template.level-- }()
-	return tag.parser(p, tokenName, argParser)
+	_ = "STUB: not implemented"
+	// consume "{%"
+	return *new(INodeTag), nil
 }
+
+// Check for identifier
+
+// Check sandbox tag restriction
+
+// Check for the existing tag
+
+// Does not exists
+
+// Add token to args
+
+// next token
+
+// EOF?
+
+// This is done to have nice EOF error messages

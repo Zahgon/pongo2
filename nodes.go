@@ -6,11 +6,6 @@ type nodeDocument struct {
 }
 
 func (doc *nodeDocument) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	for _, n := range doc.Nodes {
-		err := n.Execute(ctx, writer)
-		if err != nil {
-			return err
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }

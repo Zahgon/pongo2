@@ -2,9 +2,7 @@ package pongo2
 
 import (
 	"bytes"
-	"fmt"
 	"io"
-	"strings"
 	"sync"
 )
 
@@ -24,25 +22,30 @@ type templateWriter struct {
 
 // WriteString writes a string to the underlying writer by converting it to bytes.
 func (tw *templateWriter) WriteString(s string) (int, error) {
-	return tw.w.Write([]byte(s))
+	_ = "STUB: not implemented"
+	return 0, nil
+
+	// Write writes bytes to the underlying writer.
 }
 
-// Write writes bytes to the underlying writer.
 func (tw *templateWriter) Write(b []byte) (int, error) {
-	return tw.w.Write(b)
+	_ = "STUB: not implemented"
+	return 0,
+
+		// Template represents a parsed pongo2 template ready for execution.
+		// It holds the parsed AST (Abstract Syntax Tree) and supports template
+		// inheritance through parent/child relationships and block overrides.
+		//
+		// Templates are created via TemplateSet methods (FromString, FromFile, etc.)
+		// and should not be instantiated directly. Once parsed, a Template can be
+		// executed multiple times with different contexts.
+		//
+		// The execution flow is:
+		//
+		//	Template String → Lexer → Tokens → Parser → AST (root) → Execute → Output
+		nil
 }
 
-// Template represents a parsed pongo2 template ready for execution.
-// It holds the parsed AST (Abstract Syntax Tree) and supports template
-// inheritance through parent/child relationships and block overrides.
-//
-// Templates are created via TemplateSet methods (FromString, FromFile, etc.)
-// and should not be instantiated directly. Once parsed, a Template can be
-// executed multiple times with different contexts.
-//
-// The execution flow is:
-//
-//	Template String → Lexer → Tokens → Parser → AST (root) → Execute → Output
 type Template struct {
 	// set is the TemplateSet this template belongs to. It provides access to
 	// shared configuration, registered tags/filters, template loaders, and
@@ -124,7 +127,8 @@ type Template struct {
 // The template is marked as a string template (not file-based), which affects path
 // resolution for include/extends tags. Returns the parsed template or an error.
 func newTemplateString(set *TemplateSet, tpl []byte) (*Template, error) {
-	return newTemplate(set, "<string>", true, tpl)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // newTemplate creates a new template with the given name and source.
@@ -140,76 +144,29 @@ func newTemplateString(set *TemplateSet, tpl []byte) (*Template, error) {
 //   - isTplString: true if created from string, false if from file
 //   - tpl: The raw template source bytes
 func newTemplate(set *TemplateSet, name string, isTplString bool, tpl []byte) (*Template, error) {
-	strTpl := string(tpl)
+	_ = "STUB: not implemented"
+	return nil,
 
-	// Mark that a template has been created (prevents further tag/filter banning)
-	set.firstTemplateCreated.Store(true)
-
-	// Ensure builtin tags and filters are copied to this template set
-	set.initOnce.Do(set.initBuiltins)
-
-	// Create the template
-	t := &Template{
-		set:            set,
-		isTplString:    isTplString,
-		name:           name,
-		size:           len(strTpl),
-		blocks:         make(map[string]*NodeWrapper),
-		exportedMacros: make(map[string]*tagMacroNode),
-		Options:        newOptions(),
-	}
-	// Copy all settings from another Options.
-	t.Options.Update(set.Options)
-
-	// Tokenize it
-	tokens, err := lex(name, strTpl)
-	if err != nil {
-		return nil, err
-	}
-	t.tokens = tokens
-
-	// Parse it
-	err = t.parse()
-	if err != nil {
-		return nil, err
-	}
-
-	return t, nil
+		// Mark that a template has been created (prevents further tag/filter banning)
+		nil
 }
+
+// Ensure builtin tags and filters are copied to this template set
+
+// Create the template
+
+// Copy all settings from another Options.
+
+// Tokenize it
+
+// Parse it
 
 // applyWhitespaceOptions applies TrimBlocks/LStripBlocks whitespace options
 // to the template's token list. This is called once at parse time to avoid
 // race conditions with concurrent template execution.
 //
 // Issue #94 https://github.com/flosch/pongo2/issues/94
-func (tpl *Template) applyWhitespaceOptions() {
-	if !tpl.Options.TrimBlocks && !tpl.Options.LStripBlocks {
-		return
-	}
-
-	prev := &Token{
-		Typ: TokenHTML,
-		Val: "\n",
-	}
-
-	for _, t := range tpl.tokens {
-		if tpl.Options.LStripBlocks {
-			if prev.Typ == TokenHTML && t.Typ != TokenHTML && t.Val == "{%" {
-				prev.Val = strings.TrimRight(prev.Val, "\t ")
-			}
-		}
-
-		if tpl.Options.TrimBlocks {
-			if prev.Typ != TokenHTML && t.Typ == TokenHTML && prev.Val == "%}" {
-				if len(t.Val) > 0 && t.Val[0] == '\n' {
-					t.Val = t.Val[1:]
-				}
-			}
-		}
-
-		prev = t
-	}
-}
+func (tpl *Template) applyWhitespaceOptions() { _ = "STUB: not implemented"; return }
 
 // newContextForExecution prepares the template and context for execution.
 // It performs several tasks:
@@ -220,71 +177,37 @@ func (tpl *Template) applyWhitespaceOptions() {
 //
 // Returns the root parent template to execute, the execution context, and any error.
 func (tpl *Template) newContextForExecution(context Context) (*Template, *ExecutionContext, error) {
+	_ = "STUB: not implemented"
 	// Apply TrimBlocks/LStripBlocks whitespace options exactly once.
 	// Using sync.Once ensures thread-safety for concurrent execution.
-	tpl.whitespaceOnce.Do(tpl.applyWhitespaceOptions)
-
-	// Determine the parent to be executed (for template inheritance)
-	parent := tpl
-	for parent.parent != nil {
-		parent = parent.parent
-	}
-
-	// Create context if none is given
-	newContext := make(Context)
-	newContext.Update(tpl.set.Globals)
-
-	if context != nil {
-		newContext.Update(context)
-
-		if len(newContext) > 0 {
-			// Check for context name syntax
-			err := newContext.checkForValidIdentifiers()
-			if err != nil {
-				return parent, nil, err
-			}
-
-			// Check for clashes with macro names
-			for k := range newContext {
-				_, has := tpl.exportedMacros[k]
-				if has {
-					return parent, nil, &Error{
-						Filename:  tpl.name,
-						Sender:    "execution",
-						OrigError: fmt.Errorf("context key name '%s' clashes with macro '%s'", k, k),
-					}
-				}
-			}
-		}
-	}
-
-	// Create operational context
-	ctx := newExecutionContext(parent, newContext)
-
-	return parent, ctx, nil
+	return nil, nil, nil
 }
+
+// Determine the parent to be executed (for template inheritance)
+
+// Create context if none is given
+
+// Check for context name syntax
+
+// Check for clashes with macro names
+
+// Create operational context
 
 // execute is the internal execution method that renders the template to a TemplateWriter.
 // It prepares the execution context and runs the root document node's Execute method.
 // This is the core execution path used by all public Execute* methods.
 func (tpl *Template) execute(context Context, writer TemplateWriter) error {
-	parent, ctx, err := tpl.newContextForExecution(context)
-	if err != nil {
-		return err
-	}
-
-	// Run the selected document
-	if err := parent.root.Execute(ctx, writer); err != nil {
-		return err
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Run the selected document
 
 // newTemplateWriterAndExecute wraps an io.Writer in a templateWriter and executes.
 // This allows any io.Writer to be used for template output.
 func (tpl *Template) newTemplateWriterAndExecute(context Context, writer io.Writer) error {
-	return tpl.execute(context, &templateWriter{w: writer})
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // newBufferAndExecute creates a pre-sized buffer and executes the template into it.
@@ -292,13 +215,10 @@ func (tpl *Template) newTemplateWriterAndExecute(context Context, writer io.Writ
 // expand during rendering (variables, loops, includes, etc.).
 // Returns the filled buffer or an error if execution fails.
 func (tpl *Template) newBufferAndExecute(context Context) (*bytes.Buffer, error) {
+	_ = "STUB: not implemented"
 	// Create output buffer. We assume that the rendered template will be 30%
 	// larger
-	buffer := bytes.NewBuffer(make([]byte, 0, int(float64(tpl.size)*1.3)))
-	if err := tpl.execute(context, buffer); err != nil {
-		return nil, err
-	}
-	return buffer, nil
+	return nil, nil
 }
 
 // ExecuteWriter executes the template with the given context and writes to writer.
@@ -309,14 +229,7 @@ func (tpl *Template) newBufferAndExecute(context Context) (*bytes.Buffer, error)
 // For high-performance scenarios where partial writes on error are acceptable,
 // use ExecuteWriterUnbuffered instead.
 func (tpl *Template) ExecuteWriter(context Context, writer io.Writer) error {
-	buf, err := tpl.newBufferAndExecute(context)
-	if err != nil {
-		return err
-	}
-	_, err = buf.WriteTo(writer)
-	if err != nil {
-		return err
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -332,19 +245,17 @@ func (tpl *Template) ExecuteWriter(context Context, writer io.Writer) error {
 //
 // For atomic writes (nothing written on error), use ExecuteWriter instead.
 func (tpl *Template) ExecuteWriterUnbuffered(context Context, writer io.Writer) error {
-	return tpl.newTemplateWriterAndExecute(context, writer)
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ExecuteBytes executes the template and returns the rendered output as a byte slice.
 // Context can be nil for templates that don't require variables.
 // Returns nil and an error if template execution fails.
 func (tpl *Template) ExecuteBytes(context Context) ([]byte, error) {
+	_ = "STUB: not implemented"
 	// Execute template
-	buffer, err := tpl.newBufferAndExecute(context)
-	if err != nil {
-		return nil, err
-	}
-	return buffer.Bytes(), nil
+	return nil, nil
 }
 
 // Execute executes the template and returns the rendered output as a string.
@@ -352,13 +263,9 @@ func (tpl *Template) ExecuteBytes(context Context) ([]byte, error) {
 // Context can be nil for templates that don't require variables.
 // Returns an empty string and an error if template execution fails.
 func (tpl *Template) Execute(context Context) (string, error) {
+	_ = "STUB: not implemented"
 	// Execute template
-	buffer, err := tpl.newBufferAndExecute(context)
-	if err != nil {
-		return "", err
-	}
-
-	return buffer.String(), nil
+	return "", nil
 }
 
 // ExecuteBlocks executes only the specified named blocks and returns their rendered
@@ -373,54 +280,14 @@ func (tpl *Template) Execute(context Context) (string, error) {
 // Blocks not found in the template (or its parents) are omitted from the result.
 // The method walks up the template inheritance chain to find all requested blocks.
 func (tpl *Template) ExecuteBlocks(context Context, blocks []string) (map[string]string, error) {
-	var parents []*Template
-	result := make(map[string]string)
-
-	parent := tpl
-	for parent != nil {
-		// We only want to execute the template if it has a block we want
-		for _, block := range blocks {
-			if _, ok := parent.blocks[block]; ok {
-				parents = append(parents, parent)
-				break
-			}
-		}
-		parent = parent.parent
-	}
-
-	for _, t := range parents {
-		var buffer *bytes.Buffer
-		var ctx *ExecutionContext
-		var err error
-		for _, blockName := range blocks {
-			if _, ok := result[blockName]; ok {
-				continue
-			}
-			if blockWrapper, ok := t.blocks[blockName]; ok {
-				// assign the buffer if we haven't done so
-				if buffer == nil {
-					buffer = bytes.NewBuffer(make([]byte, 0, int(float64(t.size)*1.3)))
-				}
-				// assign the context if we haven't done so
-				if ctx == nil {
-					_, ctx, err = t.newContextForExecution(context)
-					if err != nil {
-						return nil, err
-					}
-				}
-				bErr := blockWrapper.Execute(ctx, buffer)
-				if bErr != nil {
-					return nil, bErr
-				}
-				result[blockName] = buffer.String()
-				buffer.Reset()
-			}
-		}
-		// We have found all blocks
-		if len(blocks) == len(result) {
-			break
-		}
-	}
-
-	return result, nil
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// We only want to execute the template if it has a block we want
+
+// assign the buffer if we haven't done so
+
+// assign the context if we haven't done so
+
+// We have found all blocks

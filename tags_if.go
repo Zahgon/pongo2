@@ -57,72 +57,27 @@ type tagIfNode struct {
 // Execute evaluates conditions in order and renders the first matching block.
 // If no condition is true and an else block exists, it renders the else block.
 func (node *tagIfNode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	for i, condition := range node.conditions {
-		result, err := condition.Evaluate(ctx)
-		if err != nil {
-			return err
-		}
-
-		if result.IsTrue() {
-			return node.wrappers[i].Execute(ctx, writer)
-		}
-		// Last condition?
-		if len(node.conditions) == i+1 && len(node.wrappers) > i+1 {
-			return node.wrappers[i+1].Execute(ctx, writer)
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Last condition?
 
 // tagIfParser parses the {% if %} tag along with any {% elif %} and {% else %}
 // clauses. Each if/elif requires a condition expression.
 func tagIfParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	ifNode := &tagIfNode{}
+	_ = "STUB: not implemented"
+	return *
 
 	// Parse first and main IF condition
-	condition, err := arguments.ParseExpression()
-	if err != nil {
-		return nil, err
-	}
-	ifNode.conditions = append(ifNode.conditions, condition)
-
-	if arguments.Remaining() > 0 {
-		return nil, arguments.Error("If-condition is malformed.", nil)
-	}
-
-	// Check the rest
-	for {
-		wrapper, tagArgs, err := doc.WrapUntilTag("elif", "else", "endif")
-		if err != nil {
-			return nil, err
-		}
-		ifNode.wrappers = append(ifNode.wrappers, wrapper)
-
-		if wrapper.Endtag == "elif" {
-			// elif can take a condition
-			condition, err = tagArgs.ParseExpression()
-			if err != nil {
-				return nil, err
-			}
-			ifNode.conditions = append(ifNode.conditions, condition)
-
-			if tagArgs.Remaining() > 0 {
-				return nil, tagArgs.Error("Elif-condition is malformed.", nil)
-			}
-		} else {
-			if tagArgs.Count() > 0 {
-				// else/endif can't take any conditions
-				return nil, tagArgs.Error("Arguments not allowed here.", nil)
-			}
-		}
-
-		if wrapper.Endtag == "endif" {
-			break
-		}
-	}
-
-	return ifNode, nil
+	new(INodeTag), nil
 }
+
+// Check the rest
+
+// elif can take a condition
+
+// else/endif can't take any conditions
 
 func init() {
 	mustRegisterTag("if", tagIfParser)

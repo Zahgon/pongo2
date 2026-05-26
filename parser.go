@@ -1,12 +1,5 @@
 package pongo2
 
-import (
-	"errors"
-	"fmt"
-	"slices"
-	"strings"
-)
-
 // INode is the base interface for all executable template nodes.
 // See INodeTag for template tags returned by tag parsers.
 //
@@ -46,87 +39,56 @@ type Parser struct {
 // Used inside pongo2 to parse documents and to provide an easy-to-use
 // parser for tag authors
 func newParser(name string, tokens []*Token, template *Template) *Parser {
-	p := &Parser{
-		name:     name,
-		tokens:   tokens,
-		template: template,
-	}
-	if len(tokens) > 0 {
-		p.lastToken = tokens[len(tokens)-1]
-	}
-	return p
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Consume one token. It will be gone forever.
 func (p *Parser) Consume() {
-	p.ConsumeN(1)
+	_ = "STUB: not implemented"
+
+	// Consume N tokens. They will be gone forever.
+	return
 }
 
-// Consume N tokens. They will be gone forever.
 func (p *Parser) ConsumeN(count int) {
-	p.idx += count
+	_ = "STUB: not implemented"
+
+	// Returns the current token.
+	return
 }
 
-// Returns the current token.
-func (p *Parser) Current() *Token {
-	return p.Get(p.idx)
-}
+func (p *Parser) Current() *Token { _ = "STUB: not implemented"; return nil }
 
 // Returns the CURRENT token if the given type matches.
 // Consumes this token on success.
-func (p *Parser) MatchType(typ TokenType) *Token {
-	if t := p.PeekType(typ); t != nil {
-		p.Consume()
-		return t
-	}
-	return nil
-}
+func (p *Parser) MatchType(typ TokenType) *Token { _ = "STUB: not implemented"; return nil }
 
 // Returns the CURRENT token if the given type AND value matches.
 // Consumes this token on success.
-func (p *Parser) Match(typ TokenType, val string) *Token {
-	if t := p.Peek(typ, val); t != nil {
-		p.Consume()
-		return t
-	}
-	return nil
-}
+func (p *Parser) Match(typ TokenType, val string) *Token { _ = "STUB: not implemented"; return nil }
 
 // Returns the CURRENT token if the given type AND *one* of
 // the given values matches.
 // Consumes this token on success.
 func (p *Parser) MatchOne(typ TokenType, vals ...string) *Token {
-	for _, val := range vals {
-		if t := p.Peek(typ, val); t != nil {
-			p.Consume()
-			return t
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Returns the CURRENT token if the given type matches.
 // It DOES NOT consume the token.
-func (p *Parser) PeekType(typ TokenType) *Token {
-	return p.PeekTypeN(0, typ)
-}
+func (p *Parser) PeekType(typ TokenType) *Token { _ = "STUB: not implemented"; return nil }
 
 // Returns the CURRENT token if the given type AND value matches.
 // It DOES NOT consume the token.
-func (p *Parser) Peek(typ TokenType, val string) *Token {
-	return p.PeekN(0, typ, val)
-}
+func (p *Parser) Peek(typ TokenType, val string) *Token { _ = "STUB: not implemented"; return nil }
 
 // Returns the CURRENT token if the given type AND *one* of
 // the given values matches.
 // It DOES NOT consume the token.
 func (p *Parser) PeekOne(typ TokenType, vals ...string) *Token {
-	for _, v := range vals {
-		t := p.PeekN(0, typ, v)
-		if t != nil {
-			return t
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
@@ -134,175 +96,76 @@ func (p *Parser) PeekOne(typ TokenType, vals ...string) *Token {
 // given type AND value matches for that token.
 // DOES NOT consume the token.
 func (p *Parser) PeekN(shift int, typ TokenType, val string) *Token {
-	t := p.Get(p.idx + shift)
-	if t != nil {
-		if t.Typ == typ && t.Val == val {
-			return t
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // Returns the tokens[current position + shift] token if the given type matches.
 // DOES NOT consume the token for that token.
-func (p *Parser) PeekTypeN(shift int, typ TokenType) *Token {
-	t := p.Get(p.idx + shift)
-	if t != nil {
-		if t.Typ == typ {
-			return t
-		}
-	}
-	return nil
-}
+func (p *Parser) PeekTypeN(shift int, typ TokenType) *Token { _ = "STUB: not implemented"; return nil }
 
 // Returns the UNCONSUMED token count.
-func (p *Parser) Remaining() int {
-	return len(p.tokens) - p.idx
-}
+func (p *Parser) Remaining() int { _ = "STUB: not implemented"; return 0 }
 
 // Returns the total token count.
-func (p *Parser) Count() int {
-	return len(p.tokens)
-}
+func (p *Parser) Count() int { _ = "STUB: not implemented"; return 0 }
 
 // Returns tokens[i] or NIL (if i >= len(tokens))
-func (p *Parser) Get(i int) *Token {
-	if i < len(p.tokens) && i >= 0 {
-		return p.tokens[i]
-	}
-	return nil
-}
+func (p *Parser) Get(i int) *Token { _ = "STUB: not implemented"; return nil }
 
 // Returns tokens[current-position + shift] or NIL
 // (if (current-position + i) >= len(tokens))
-func (p *Parser) GetR(shift int) *Token {
-	i := p.idx + shift
-	return p.Get(i)
-}
+func (p *Parser) GetR(shift int) *Token { _ = "STUB: not implemented"; return nil }
 
 // Error produces a nice error message and returns an error-object.
 // The 'token'-argument is optional. If provided, it will take
 // the token's position information. If not provided, it will
 // automatically use the CURRENT token's position information.
 func (p *Parser) Error(msg string, token *Token) *Error {
-	if token == nil {
-		// Set current token
-		token = p.Current()
-		if token == nil {
-			// Set to last token
-			if len(p.tokens) > 0 {
-				token = p.tokens[len(p.tokens)-1]
-			}
-		}
-	}
-	var line, col int
-	if token != nil {
-		line = token.Line
-		col = token.Col
-	}
-	return &Error{
-		Template:  p.template,
-		Filename:  p.name,
-		Sender:    "parser",
-		Line:      line,
-		Column:    col,
-		Token:     token,
-		OrigError: errors.New(msg),
-	}
+	_ = "STUB: not implemented"
+
+	// Set current token
+	return nil
 }
+
+// Set to last token
 
 // Wraps all nodes between starting tag and "{% endtag %}" and provides
 // one simple interface to execute the wrapped nodes.
 // It returns a parser to process provided arguments to the tag.
 func (p *Parser) WrapUntilTag(names ...string) (*NodeWrapper, *Parser, error) {
-	wrapper := &NodeWrapper{}
-
-	var tagArgs []*Token
-
-	for p.Remaining() > 0 {
-		// New tag, check whether we have to stop wrapping here
-		if p.Peek(TokenSymbol, "{%") != nil {
-			tagIdent := p.PeekTypeN(1, TokenIdentifier)
-
-			if tagIdent != nil {
-				// We've found a (!) end-tag
-
-				found := slices.Contains(names, tagIdent.Val)
-
-				// We only process the tag if we've found an end tag
-				if found {
-					// Okay, endtag found.
-					p.ConsumeN(2) // '{%' tagname
-
-					for {
-						if p.Match(TokenSymbol, "%}") != nil {
-							// Okay, end the wrapping here
-							wrapper.Endtag = tagIdent.Val
-							return wrapper, newParser(p.template.name, tagArgs, p.template), nil
-						}
-						t := p.Current()
-						p.Consume()
-						if t == nil {
-							return nil, nil, p.Error("Unexpected EOF.", p.lastToken)
-						}
-						tagArgs = append(tagArgs, t)
-					}
-				}
-			}
-
-		}
-
-		// Otherwise process next element to be wrapped
-		node, err := p.parseDocElement()
-		if err != nil {
-			return nil, nil, err
-		}
-		wrapper.nodes = append(wrapper.nodes, node)
-	}
-
-	return nil, nil, p.Error(fmt.Sprintf("Unexpected EOF, expected tag %s.", strings.Join(names, " or ")),
-		p.lastToken)
+	_ = "STUB: not implemented"
+	return nil, nil, nil
 }
+
+// New tag, check whether we have to stop wrapping here
+
+// We've found a (!) end-tag
+
+// We only process the tag if we've found an end tag
+
+// Okay, endtag found.
+// '{%' tagname
+
+// Okay, end the wrapping here
+
+// Otherwise process next element to be wrapped
 
 // Skips all nodes between starting tag and "{% endtag %}"
-func (p *Parser) SkipUntilTag(names ...string) error {
-	for p.Remaining() > 0 {
-		// New tag, check whether we have to stop wrapping here
-		if p.Peek(TokenSymbol, "{%") != nil {
-			tagIdent := p.PeekTypeN(1, TokenIdentifier)
+func (p *Parser) SkipUntilTag(names ...string) error { _ = "STUB: not implemented"; return nil }
 
-			if tagIdent != nil {
-				// We've found an (!) end-tag
+// New tag, check whether we have to stop wrapping here
 
-				found := slices.Contains(names, tagIdent.Val)
+// We've found an (!) end-tag
 
-				// We only process the tag if we've found an end tag
-				if found {
-					// Okay, endtag found.
-					p.ConsumeN(2) // '{%' tagname
+// We only process the tag if we've found an end tag
 
-					for {
-						if p.Match(TokenSymbol, "%}") != nil {
-							// Done skipping, exit.
-							return nil
-						}
-						// If we haven't encountered '%}', we consume whatever
-						// there might be.
-						p.Consume()
-						if p.Current() == nil {
-							// EOF encountered
-							return p.Error("Unexpected EOF, expected '%}'", p.lastToken)
-						}
-					}
-				}
-			}
-		}
-		t := p.Current()
-		p.Consume()
-		if t == nil {
-			return p.Error("Unexpected EOF.", p.lastToken)
-		}
-	}
+// Okay, endtag found.
+// '{%' tagname
 
-	return p.Error(fmt.Sprintf("Unexpected EOF, expected tag %s.", strings.Join(names, " or ")), p.lastToken)
-}
+// Done skipping, exit.
+
+// If we haven't encountered '%}', we consume whatever
+// there might be.
+
+// EOF encountered

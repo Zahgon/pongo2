@@ -35,50 +35,18 @@ type tagFirstofNode struct {
 // Execute evaluates arguments in order and outputs the first truthy value.
 // HTML escaping is applied when autoescape is enabled (unless |safe is used).
 func (node *tagFirstofNode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	for _, arg := range node.args {
-		val, err := arg.Evaluate(ctx)
-		if err != nil {
-			return err
-		}
-
-		if val.IsTrue() {
-			if ctx.Autoescape && !arg.FilterApplied("safe") {
-				val, err = ctx.template.set.ApplyFilter("escape", val, nil)
-				if err != nil {
-					return err
-				}
-			}
-
-			_, err = writer.WriteString(val.String())
-			return err
-		}
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // tagFirstofParser parses the {% firstof %} tag. It requires at least one
 // expression argument; all arguments are parsed as potential fallback values.
 func tagFirstofParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	firstofNode := &tagFirstofNode{
-		position: start,
-	}
-
-	// Django requires at least one argument
-	if arguments.Count() == 0 {
-		return nil, arguments.Error("Tag 'firstof' requires at least one argument.", nil)
-	}
-
-	for arguments.Remaining() > 0 {
-		node, err := arguments.ParseExpression()
-		if err != nil {
-			return nil, err
-		}
-		firstofNode.args = append(firstofNode.args, node)
-	}
-
-	return firstofNode, nil
+	_ = "STUB: not implemented"
+	return *new(INodeTag), nil
 }
+
+// Django requires at least one argument
 
 func init() {
 	mustRegisterTag("firstof", tagFirstofParser)

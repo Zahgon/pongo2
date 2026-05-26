@@ -1,8 +1,6 @@
 package pongo2
 
 import (
-	"errors"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -74,252 +72,119 @@ type TemplateSet struct {
 // (e. g. web from mail templates), with different globals or
 // other configurations.
 func NewSet(name string, loaders ...TemplateLoader) *TemplateSet {
-	if len(loaders) == 0 {
-		panic(fmt.Errorf("at least one template loader must be specified"))
-	}
-	for i, loader := range loaders {
-		if loader == nil {
-			panic(fmt.Errorf("loader at index %d is nil", i))
-		}
-	}
-
-	return &TemplateSet{
-		name:       name,
-		loaders:    loaders,
-		Globals:    make(Context),
-		autoescape: true,
-		// tags and filters are lazily initialized via initOnce
-		bannedTags:       make(map[string]bool),
-		bannedFilters:    make(map[string]bool),
-		templateCache:    make(map[string]*Template),
-		templatesParsing: make(map[string]bool),
-		Options:          newOptions(),
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
 
-func (set *TemplateSet) AddLoader(loaders ...TemplateLoader) {
-	set.loaders = append(set.loaders, loaders...)
-}
+// tags and filters are lazily initialized via initOnce
+
+func (set *TemplateSet) AddLoader(loaders ...TemplateLoader) { _ = "STUB: not implemented"; return }
 
 // isTemplateParsing checks if a template is currently being parsed.
 // This is used to detect recursive includes at parse time.
 func (set *TemplateSet) isTemplateParsing(filename string) bool {
-	set.templatesParsingMutex.Lock()
-	defer set.templatesParsingMutex.Unlock()
-	return set.templatesParsing[filename]
+	_ = "STUB: not implemented"
+	return false
 }
 
 // markTemplateParsing marks a template as currently being parsed.
-func (set *TemplateSet) markTemplateParsing(filename string) {
-	set.templatesParsingMutex.Lock()
-	defer set.templatesParsingMutex.Unlock()
-	set.templatesParsing[filename] = true
-}
+func (set *TemplateSet) markTemplateParsing(filename string) { _ = "STUB: not implemented"; return }
 
 // unmarkTemplateParsing removes a template from the parsing set.
-func (set *TemplateSet) unmarkTemplateParsing(filename string) {
-	set.templatesParsingMutex.Lock()
-	defer set.templatesParsingMutex.Unlock()
-	delete(set.templatesParsing, filename)
-}
+func (set *TemplateSet) unmarkTemplateParsing(filename string) { _ = "STUB: not implemented"; return }
 
 // initBuiltins copies the builtin tags and filters into this template set.
 // This is called lazily via initOnce to ensure builtinTags and builtinFilters
 // have been populated by init() functions before copying.
-func (set *TemplateSet) initBuiltins() {
-	set.tags = copyTags(builtinTags)
-	set.filters = copyFilters(builtinFilters)
-}
+func (set *TemplateSet) initBuiltins() { _ = "STUB: not implemented"; return }
 
 func (set *TemplateSet) resolveFilename(tpl *Template, path string) string {
-	return set.resolveFilenameForLoader(set.loaders[0], tpl, path)
+	_ = "STUB: not implemented"
+	return ""
 }
 
 func (set *TemplateSet) resolveFilenameForLoader(loader TemplateLoader, tpl *Template, path string) string {
-	name := ""
-	if tpl != nil && tpl.isTplString {
-		return path
-	}
-	if tpl != nil {
-		name = tpl.name
-	}
-
-	return loader.Abs(name, path)
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // BanTag bans a specific tag for this template set. See more in the documentation for TemplateSet.
-func (set *TemplateSet) BanTag(name string) error {
-	set.initOnce.Do(set.initBuiltins)
-	_, has := set.tags[name]
-	if !has {
-		return fmt.Errorf("tag '%s' not found", name)
-	}
-	if set.firstTemplateCreated.Load() {
-		return errors.New("you cannot ban any tags after you've added your first template to your template set")
-	}
-	_, has = set.bannedTags[name]
-	if has {
-		return fmt.Errorf("tag '%s' is already banned", name)
-	}
-	set.bannedTags[name] = true
-
-	return nil
-}
+func (set *TemplateSet) BanTag(name string) error { _ = "STUB: not implemented"; return nil }
 
 // BanFilter bans a specific filter for this template set. See more in the documentation for TemplateSet.
-func (set *TemplateSet) BanFilter(name string) error {
-	set.initOnce.Do(set.initBuiltins)
-	_, has := set.filters[name]
-	if !has {
-		return fmt.Errorf("filter '%s' not found", name)
-	}
-	if set.firstTemplateCreated.Load() {
-		return errors.New("you cannot ban any filters after you've added your first template to your template set")
-	}
-	_, has = set.bannedFilters[name]
-	if has {
-		return fmt.Errorf("filter '%s' is already banned", name)
-	}
-	set.bannedFilters[name] = true
-
-	return nil
-}
+func (set *TemplateSet) BanFilter(name string) error { _ = "STUB: not implemented"; return nil }
 
 // RegisterFilter registers a new filter for this template set.
 func (set *TemplateSet) RegisterFilter(name string, fn FilterFunction) error {
-	set.initOnce.Do(set.initBuiltins)
-	_, existing := set.filters[name]
-	if existing {
-		return fmt.Errorf("filter with name '%s' is already registered", name)
-	}
-	set.filters[name] = fn
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // RegisterFilter registers a new filter for this template set.
 func (set *TemplateSet) SetAutoescape(v bool) {
-	set.autoescape = v
+	_ = "STUB: not implemented"
+
+	// ReplaceFilter replaces an already registered filter in this template set.
+	// Use this function with caution since it allows you to change existing filter behaviour.
+	return
 }
 
-// ReplaceFilter replaces an already registered filter in this template set.
-// Use this function with caution since it allows you to change existing filter behaviour.
 func (set *TemplateSet) ReplaceFilter(name string, fn FilterFunction) error {
-	set.initOnce.Do(set.initBuiltins)
-	_, existing := set.filters[name]
-	if !existing {
-		return fmt.Errorf("filter with name '%s' does not exist (therefore cannot be overridden)", name)
-	}
-	set.filters[name] = fn
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // RegisterTag registers a new tag for this template set.
 func (set *TemplateSet) RegisterTag(name string, parserFn TagParser) error {
-	set.initOnce.Do(set.initBuiltins)
-	_, existing := set.tags[name]
-	if existing {
-		return fmt.Errorf("tag with name '%s' is already registered", name)
-	}
-	set.tags[name] = &tag{
-		name:   name,
-		parser: parserFn,
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // ReplaceTag replaces an already registered tag in this template set.
 // Use this function with caution since it allows you to change existing tag behaviour.
 func (set *TemplateSet) ReplaceTag(name string, parserFn TagParser) error {
-	set.initOnce.Do(set.initBuiltins)
-	_, existing := set.tags[name]
-	if !existing {
-		return fmt.Errorf("tag with name '%s' does not exist (therefore cannot be overridden)", name)
-	}
-	set.tags[name] = &tag{
-		name:   name,
-		parser: parserFn,
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
 
 // FilterExists returns true if the given filter is registered in this template set.
 // This checks the set's filter registry, which initially contains copies of all builtin filters
 // plus any filters registered via RegisterFilter.
-func (set *TemplateSet) FilterExists(name string) bool {
-	set.initOnce.Do(set.initBuiltins)
-	_, existing := set.filters[name]
-	return existing
-}
+func (set *TemplateSet) FilterExists(name string) bool { _ = "STUB: not implemented"; return false }
 
 // TagExists returns true if the given tag is registered in this template set.
 // This checks the set's tag registry, which initially contains copies of all builtin tags
 // plus any tags registered via RegisterTag.
-func (set *TemplateSet) TagExists(name string) bool {
-	set.initOnce.Do(set.initBuiltins)
-	_, existing := set.tags[name]
-	return existing
-}
+func (set *TemplateSet) TagExists(name string) bool { _ = "STUB: not implemented"; return false }
 
 // ApplyFilter applies a filter registered in this template set to a given value
 // using the given parameters. Returns a *pongo2.Value or an error.
 // This is useful for applying set-specific filters, including any custom filters
 // registered with RegisterFilter or replaced with ReplaceFilter.
 func (set *TemplateSet) ApplyFilter(name string, value *Value, param *Value) (*Value, error) {
-	set.initOnce.Do(set.initBuiltins)
-	fn, existing := set.filters[name]
-	if !existing {
-		return nil, &Error{
-			Sender:    "applyfilter",
-			OrigError: fmt.Errorf("filter with name '%s' not found", name),
-		}
-	}
-
-	// Make sure param is a *Value
-	if param == nil {
-		param = AsValue(nil)
-	}
-
-	return fn(value, param)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Make sure param is a *Value
 
 // MustApplyFilter behaves like ApplyFilter, but panics on an error.
 // This uses the template set's filter registry.
 func (set *TemplateSet) MustApplyFilter(name string, value *Value, param *Value) *Value {
-	val, err := set.ApplyFilter(name, value, param)
-	if err != nil {
-		panic(err)
-	}
-	return val
+	_ = "STUB: not implemented"
+	return nil
 }
 
 func (set *TemplateSet) resolveTemplate(tpl *Template, path string) (name string, loader TemplateLoader, fd io.Reader, err error) {
+	_ = "STUB: not implemented"
 	// iterate over loaders until we appear to have a valid template
-	for _, loader = range set.loaders {
-		name = set.resolveFilenameForLoader(loader, tpl, path)
-		fd, err = loader.Get(name)
-		if err == nil {
-			return
-		}
-	}
-
-	return path, nil, nil, fmt.Errorf("unable to resolve template")
+	return "", *new(TemplateLoader), *new(io.Reader), nil
 }
 
 // CleanCache cleans the template cache. If filenames is not empty,
 // it will remove the template caches of those filenames.
 // Or it will empty the whole template cache. It is thread-safe.
-func (set *TemplateSet) CleanCache(filenames ...string) {
-	set.templateCacheMutex.Lock()
-	defer set.templateCacheMutex.Unlock()
-
-	if len(filenames) == 0 {
-		set.templateCache = make(map[string]*Template, len(set.templateCache))
-	}
-
-	for _, filename := range filenames {
-		delete(set.templateCache, set.resolveFilename(nil, filename))
-	}
-}
+func (set *TemplateSet) CleanCache(filenames ...string) { _ = "STUB: not implemented"; return }
 
 // FromCache is a convenient method to cache templates. It is thread-safe
 // and will only compile the template associated with a filename once.
@@ -327,115 +192,60 @@ func (set *TemplateSet) CleanCache(filenames ...string) {
 // FromCache() will not cache the template and instead recompile it on any
 // call (to make changes to a template live instantaneously).
 func (set *TemplateSet) FromCache(filename string) (*Template, error) {
-	if set.Debug {
-		// Recompile on any request
-		return set.FromFile(filename)
-	}
-	// Cache the template
-	cleanedFilename := set.resolveFilename(nil, filename)
+	_ = "STUB: not implemented"
 
-	set.templateCacheMutex.Lock()
-	defer set.templateCacheMutex.Unlock()
-
-	tpl, has := set.templateCache[cleanedFilename]
-
-	// Cache miss
-	if !has {
-		tpl, err := set.FromFile(cleanedFilename)
-		if err != nil {
-			return nil, err
-		}
-		set.templateCache[cleanedFilename] = tpl
-		return tpl, nil
-	}
-
-	// Cache hit
-	return tpl, nil
+	// Recompile on any request
+	return nil, nil
 }
+
+// Cache the template
+
+// Cache miss
+
+// Cache hit
 
 // FromString loads a template from string and returns a Template instance.
 func (set *TemplateSet) FromString(tpl string) (*Template, error) {
-	return newTemplateString(set, []byte(tpl))
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // FromBytes loads a template from bytes and returns a Template instance.
 func (set *TemplateSet) FromBytes(tpl []byte) (*Template, error) {
-	return newTemplateString(set, tpl)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
 
 // FromFile loads a template from a filename and returns a Template instance.
 func (set *TemplateSet) FromFile(filename string) (*Template, error) {
-	resolvedName, _, fd, err := set.resolveTemplate(nil, filename)
-	if err != nil {
-		return nil, &Error{
-			Filename:  filename,
-			Sender:    "fromfile",
-			OrigError: err,
-		}
-	}
-	buf, err := io.ReadAll(fd)
-	if closer, ok := fd.(io.Closer); ok {
-		if closeErr := closer.Close(); closeErr != nil && err == nil {
-			err = closeErr
-		}
-	}
-	if err != nil {
-		return nil, &Error{
-			Filename:  filename,
-			Sender:    "fromfile",
-			OrigError: err,
-		}
-	}
-
-	// Mark this template as being parsed to detect recursive includes
-	set.markTemplateParsing(resolvedName)
-	defer set.unmarkTemplateParsing(resolvedName)
-
-	return newTemplate(set, resolvedName, false, buf)
+	_ = "STUB: not implemented"
+	return nil, nil
 }
+
+// Mark this template as being parsed to detect recursive includes
 
 // RenderTemplateString is a shortcut and renders a template string directly.
 func (set *TemplateSet) RenderTemplateString(s string, ctx Context) (string, error) {
-	tpl := Must(set.FromString(s))
-	result, err := tpl.Execute(ctx)
-	if err != nil {
-		return "", err
-	}
-	return result, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // RenderTemplateBytes is a shortcut and renders template bytes directly.
 func (set *TemplateSet) RenderTemplateBytes(b []byte, ctx Context) (string, error) {
-	tpl := Must(set.FromBytes(b))
-	result, err := tpl.Execute(ctx)
-	if err != nil {
-		return "", err
-	}
-	return result, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
 // RenderTemplateFile is a shortcut and renders a template file directly.
 func (set *TemplateSet) RenderTemplateFile(fn string, ctx Context) (string, error) {
-	tpl := Must(set.FromFile(fn))
-	result, err := tpl.Execute(ctx)
-	if err != nil {
-		return "", err
-	}
-	return result, nil
+	_ = "STUB: not implemented"
+	return "", nil
 }
 
-func (set *TemplateSet) logf(format string, args ...any) {
-	if set.Debug {
-		logger.Printf(fmt.Sprintf("[template set: %s] %s", set.name, format), args...)
-	}
-}
+func (set *TemplateSet) logf(format string, args ...any) { _ = "STUB: not implemented"; return }
 
 // Logging function (internally used)
-func logf(format string, items ...any) {
-	if debug {
-		logger.Printf(format, items...)
-	}
-}
+func logf(format string, items ...any) { _ = "STUB: not implemented"; return }
 
 var (
 	debug  bool // internal debugging

@@ -78,139 +78,40 @@ type tagForLoopInformation struct {
 // Execute iterates over the object and renders the body for each item.
 // If the object is empty, it renders the empty wrapper (if present).
 func (node *tagForNode) Execute(ctx *ExecutionContext, writer TemplateWriter) (forError error) {
+	_ = "STUB: not implemented"
 	// Backup forloop (as parentloop in public context), key-name and value-name
-	forCtx := NewChildExecutionContext(ctx)
-	parentloop := forCtx.Private["forloop"]
-
-	// Create loop struct
-	loopInfo := &tagForLoopInformation{
-		First: true,
-	}
-
-	// Is it a loop in a loop?
-	if parentloop != nil {
-		loopInfo.Parentloop = parentloop.(*tagForLoopInformation)
-	}
-
-	// Register loopInfo in public context
-	forCtx.Private["forloop"] = loopInfo
-
-	obj, err := node.objectEvaluator.Evaluate(forCtx)
-	if err != nil {
-		return err
-	}
-
-	obj.IterateOrder(func(idx, count int, key, value *Value) bool {
-		// There's something to iterate over (correct type and at least 1 item)
-
-		// Update loop infos and public context
-		forCtx.Private[node.key] = key
-		if value != nil && node.value != "" {
-			forCtx.Private[node.value] = value
-		}
-		loopInfo.Counter = idx + 1
-		loopInfo.Counter0 = idx
-		if idx == 1 {
-			loopInfo.First = false
-		}
-		if idx+1 == count {
-			loopInfo.Last = true
-		}
-		loopInfo.Revcounter = count - idx
-		loopInfo.Revcounter0 = count - (idx + 1)
-
-		// Render elements with updated context
-		err := node.bodyWrapper.Execute(forCtx, writer)
-		if err != nil {
-			forError = err
-			return false
-		}
-		return true
-	}, func() {
-		// Nothing to iterate over (maybe wrong type or no items)
-		if node.emptyWrapper != nil {
-			err := node.emptyWrapper.Execute(forCtx, writer)
-			if err != nil {
-				forError = err
-			}
-		}
-	}, node.reversed, node.sorted)
-
-	return forError
+	return nil
 }
+
+// Create loop struct
+
+// Is it a loop in a loop?
+
+// Register loopInfo in public context
+
+// There's something to iterate over (correct type and at least 1 item)
+
+// Update loop infos and public context
+
+// Render elements with updated context
+
+// Nothing to iterate over (maybe wrong type or no items)
 
 // tagForParser parses the {% for %} tag. It supports key/value iteration,
 // "in" keyword, and optional "reversed" and "sorted" modifiers.
 func tagForParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	forNode := &tagForNode{}
+	_ = "STUB: not implemented"
+	return *
 
 	// Arguments parsing
-	var valueToken *Token
-	keyToken := arguments.MatchType(TokenIdentifier)
-	if keyToken == nil {
-		return nil, arguments.Error("Expected an key identifier as first argument for 'for'-tag", nil)
-	}
-
-	if arguments.Match(TokenSymbol, ",") != nil {
-		// Value name is provided
-		valueToken = arguments.MatchType(TokenIdentifier)
-		if valueToken == nil {
-			return nil, arguments.Error("Value name must be an identifier.", nil)
-		}
-	}
-
-	if arguments.Match(TokenKeyword, "in") == nil {
-		return nil, arguments.Error("Expected keyword 'in'.", nil)
-	}
-
-	objectEvaluator, err := arguments.ParseExpression()
-	if err != nil {
-		return nil, err
-	}
-	forNode.objectEvaluator = objectEvaluator
-	forNode.key = keyToken.Val
-	if valueToken != nil {
-		forNode.value = valueToken.Val
-	}
-
-	if arguments.MatchOne(TokenIdentifier, "reversed") != nil {
-		forNode.reversed = true
-	}
-
-	if arguments.MatchOne(TokenIdentifier, "sorted") != nil {
-		forNode.sorted = true
-	}
-
-	if arguments.Remaining() > 0 {
-		return nil, arguments.Error("Malformed for-loop arguments.", nil)
-	}
-
-	// Body wrapping
-	wrapper, endargs, err := doc.WrapUntilTag("empty", "endfor")
-	if err != nil {
-		return nil, err
-	}
-	forNode.bodyWrapper = wrapper
-
-	if endargs.Count() > 0 {
-		return nil, endargs.Error("Arguments not allowed here.", nil)
-	}
-
-	if wrapper.Endtag == "empty" {
-		// if there's an else in the if-statement, we need the else-Block as well
-		wrapper, endargs, err = doc.WrapUntilTag("endfor")
-		if err != nil {
-			return nil, err
-		}
-		forNode.emptyWrapper = wrapper
-
-		if endargs.Count() > 0 {
-			return nil, endargs.Error("Arguments not allowed here.", nil)
-		}
-	}
-
-	return forNode, nil
+	new(INodeTag), nil
 }
+
+// Value name is provided
+
+// Body wrapping
+
+// if there's an else in the if-statement, we need the else-Block as well
 
 func init() {
 	mustRegisterTag("for", tagForParser)

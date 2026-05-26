@@ -12,17 +12,7 @@ type Options struct {
 	LStripBlocks bool
 }
 
-func newOptions() *Options {
-	return &Options{
-		TrimBlocks:   false,
-		LStripBlocks: false,
-	}
-}
+func newOptions() *Options { _ = "STUB: not implemented"; return nil }
 
 // Update updates this options from another options.
-func (opt *Options) Update(other *Options) *Options {
-	opt.TrimBlocks = other.TrimBlocks
-	opt.LStripBlocks = other.LStripBlocks
-
-	return opt
-}
+func (opt *Options) Update(other *Options) *Options { _ = "STUB: not implemented"; return nil }

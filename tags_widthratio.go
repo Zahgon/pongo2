@@ -1,10 +1,5 @@
 package pongo2
 
-import (
-	"fmt"
-	"math"
-)
-
 // tagWidthratioNode represents the {% widthratio %} tag.
 //
 // The widthratio tag calculates a ratio and multiplies it by a constant,
@@ -51,81 +46,20 @@ type tagWidthratioNode struct {
 // Execute calculates the ratio (current/max*width), rounds using banker's
 // rounding, and either outputs the result or stores it in the context if "as" was specified.
 func (node *tagWidthratioNode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	current, err := node.current.Evaluate(ctx)
-	if err != nil {
-		return err
-	}
-
-	max, err := node.max.Evaluate(ctx)
-	if err != nil {
-		return err
-	}
-
-	width, err := node.width.Evaluate(ctx)
-	if err != nil {
-		return err
-	}
-
-	var value int
-	maxFloat := max.Float()
-	if maxFloat == 0 {
-		value = 0
-	} else {
-		// Use banker's rounding (round half to even) to match Python's round()
-		value = int(math.RoundToEven(current.Float() / maxFloat * width.Float()))
-	}
-
-	if node.ctxName == "" {
-		if _, err := fmt.Fprintf(writer, "%d", value); err != nil {
-			return err
-		}
-	} else {
-		ctx.Private[node.ctxName] = value
-	}
-
+	_ = "STUB: not implemented"
 	return nil
 }
+
+// Use banker's rounding (round half to even) to match Python's round()
 
 // tagWidthratioParser parses the {% widthratio %} tag. It requires three
 // expressions (current, max, width) and optionally "as name" to store the result.
 func tagWidthratioParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	widthratioNode := &tagWidthratioNode{
-		position: start,
-	}
-
-	current, err := arguments.ParseExpression()
-	if err != nil {
-		return nil, err
-	}
-	widthratioNode.current = current
-
-	max, err := arguments.ParseExpression()
-	if err != nil {
-		return nil, err
-	}
-	widthratioNode.max = max
-
-	width, err := arguments.ParseExpression()
-	if err != nil {
-		return nil, err
-	}
-	widthratioNode.width = width
-
-	if arguments.MatchOne(TokenKeyword, "as") != nil {
-		// Name follows
-		nameToken := arguments.MatchType(TokenIdentifier)
-		if nameToken == nil {
-			return nil, arguments.Error("Expected name (identifier).", nil)
-		}
-		widthratioNode.ctxName = nameToken.Val
-	}
-
-	if arguments.Remaining() > 0 {
-		return nil, arguments.Error("Malformed widthratio-tag arguments.", nil)
-	}
-
-	return widthratioNode, nil
+	_ = "STUB: not implemented"
+	return *new(INodeTag), nil
 }
+
+// Name follows
 
 func init() {
 	mustRegisterTag("widthratio", tagWidthratioParser)

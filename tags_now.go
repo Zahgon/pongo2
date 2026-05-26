@@ -1,9 +1,5 @@
 package pongo2
 
-import (
-	"time"
-)
-
 // tagNowNode represents the {% now %} tag.
 //
 // Django difference: Django uses PHP-style format characters (e.g., "Y-m-d");
@@ -47,39 +43,15 @@ type tagNowNode struct {
 
 // Execute formats and outputs the current time (or a fixed test time if "fake").
 func (node *tagNowNode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	var t time.Time
-	if node.fake {
-		t = time.Date(2014, time.February, 05, 18, 31, 45, 00, time.UTC)
-	} else {
-		t = time.Now()
-	}
-
-	_, err := writer.WriteString(t.Format(node.format))
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // tagNowParser parses the {% now %} tag. It requires a format string argument
 // and optionally accepts "fake" for deterministic testing output.
 func tagNowParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	nowNode := &tagNowNode{
-		position: start,
-	}
-
-	formatToken := arguments.MatchType(TokenString)
-	if formatToken == nil {
-		return nil, arguments.Error("Expected a format string.", nil)
-	}
-	nowNode.format = formatToken.Val
-
-	if arguments.MatchOne(TokenIdentifier, "fake") != nil {
-		nowNode.fake = true
-	}
-
-	if arguments.Remaining() > 0 {
-		return nil, arguments.Error("Malformed now-tag arguments.", nil)
-	}
-
-	return nowNode, nil
+	_ = "STUB: not implemented"
+	return *new(INodeTag), nil
 }
 
 func init() {

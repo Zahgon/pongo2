@@ -1,8 +1,6 @@
 package pongo2
 
 import (
-	"fmt"
-	"math/rand"
 	"strings"
 )
 
@@ -64,86 +62,28 @@ type tagLoremNode struct {
 
 // writeLoremItems writes items from the source slice with separator, prefix, and suffix.
 func writeLoremItems(writer TemplateWriter, count int, source []string, sep, prefix, suffix string, random bool) error {
-	for i := range count {
-		if i > 0 {
-			if _, err := writer.WriteString(sep); err != nil {
-				return err
-			}
-		}
-		if prefix != "" {
-			if _, err := writer.WriteString(prefix); err != nil {
-				return err
-			}
-		}
-		var item string
-		if random {
-			item = source[rand.Intn(len(source))] //nolint:gosec // G404: lorem ipsum generation, cryptographic randomness not needed
-		} else {
-			item = source[i%len(source)]
-		}
-		if _, err := writer.WriteString(item); err != nil {
-			return err
-		}
-		if suffix != "" {
-			if _, err := writer.WriteString(suffix); err != nil {
-				return err
-			}
-		}
-	}
+	_ = "STUB: not implemented"
 	return nil
 }
+
+//nolint:gosec // G404: lorem ipsum generation, cryptographic randomness not needed
 
 // Execute outputs lorem ipsum text according to the configured method
 // (words, paragraphs, or HTML paragraphs) and count.
 func (node *tagLoremNode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
-	if node.count > maxLoremCount {
-		return ctx.Error(fmt.Sprintf("max count for lorem is %d", maxLoremCount), node.position)
-	}
-
-	switch node.method {
-	case "b":
-		// Django: "\n\n".join(paras)
-		return writeLoremItems(writer, node.count, tagLoremParagraphs, "\n\n", "", "", node.random)
-	case "w":
-		return writeLoremItems(writer, node.count, tagLoremWords, " ", "", "", node.random)
-	case "p":
-		// Django: "\n\n".join("<p>%s</p>" % p for p in paras)
-		return writeLoremItems(writer, node.count, tagLoremParagraphs, "\n\n", "<p>", "</p>", node.random)
-	default:
-		return ctx.OrigError(fmt.Errorf("unsupported method: %s", node.method), nil)
-	}
+	_ = "STUB: not implemented"
+	return nil
 }
+
+// Django: "\n\n".join(paras)
+
+// Django: "\n\n".join("<p>%s</p>" % p for p in paras)
 
 // tagLoremParser parses the {% lorem %} tag. It accepts an optional count,
 // method (w/p/b), and "random" flag.
 func tagLoremParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	loremNode := &tagLoremNode{
-		position: start,
-		count:    1,
-		method:   "b",
-	}
-
-	if countToken := arguments.MatchType(TokenNumber); countToken != nil {
-		loremNode.count = AsValue(countToken.Val).Integer()
-	}
-
-	if methodToken := arguments.MatchType(TokenIdentifier); methodToken != nil {
-		if methodToken.Val != "w" && methodToken.Val != "p" && methodToken.Val != "b" {
-			return nil, arguments.Error("lorem-method must be either 'w', 'p' or 'b'.", nil)
-		}
-
-		loremNode.method = methodToken.Val
-	}
-
-	if arguments.MatchOne(TokenIdentifier, "random") != nil {
-		loremNode.random = true
-	}
-
-	if arguments.Remaining() > 0 {
-		return nil, arguments.Error("Malformed lorem-tag arguments.", nil)
-	}
-
-	return loremNode, nil
+	_ = "STUB: not implemented"
+	return *new(INodeTag), nil
 }
 
 func init() {

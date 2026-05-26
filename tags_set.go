@@ -38,46 +38,24 @@ type tagSetNode struct {
 // Execute evaluates the expression and assigns the result to the named
 // variable in the private context.
 func (node *tagSetNode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
+	_ = "STUB: not implemented"
 	// Evaluate expression
-	value, err := node.expression.Evaluate(ctx)
-	if err != nil {
-		return err
-	}
-
-	ctx.Private[node.name] = value
 	return nil
 }
 
 // tagSetParser parses the {% set %} tag. It requires an identifier,
 // an equals sign, and an expression: {% set name = expression %}.
 func tagSetParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	node := &tagSetNode{}
+	_ = "STUB: not implemented"
+	return *
 
 	// Parse variable name
-	typeToken := arguments.MatchType(TokenIdentifier)
-	if typeToken == nil {
-		return nil, arguments.Error("Expected an identifier.", nil)
-	}
-	node.name = typeToken.Val
-
-	if arguments.Match(TokenSymbol, "=") == nil {
-		return nil, arguments.Error("Expected '='.", nil)
-	}
-
-	// Variable expression
-	keyExpression, err := arguments.ParseExpression()
-	if err != nil {
-		return nil, err
-	}
-	node.expression = keyExpression
-
-	// Remaining arguments
-	if arguments.Remaining() > 0 {
-		return nil, arguments.Error("Malformed 'set'-tag arguments.", nil)
-	}
-
-	return node, nil
+	new(INodeTag), nil
 }
+
+// Variable expression
+
+// Remaining arguments
 
 func init() {
 	mustRegisterTag("set", tagSetParser)

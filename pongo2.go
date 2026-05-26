@@ -7,9 +7,4 @@ const Version = "7.0.0-alpha.1"
 // would use it:
 //
 //	var baseTemplate = pongo2.Must(pongo2.FromFile("templates/base.html"))
-func Must(tpl *Template, err error) *Template {
-	if err != nil {
-		panic(err)
-	}
-	return tpl
-}
+func Must(tpl *Template, err error) *Template { _ = "STUB: not implemented"; return nil }

@@ -2,10 +2,7 @@
 package pongo2
 
 import (
-	"errors"
-	"fmt"
 	"strings"
-	"unicode/utf8"
 )
 
 const (
@@ -209,37 +206,7 @@ type lexer struct {
 // String returns a human-readable representation of the token for debugging.
 // Long values (>1000 chars) are truncated to show the beginning and end.
 // Format: <Token Typ=TYPE (num) Val='value' Line=N Col=N, WT=bool>
-func (t *Token) String() string {
-	val := t.Val
-	if len(val) > 1000 {
-		val = fmt.Sprintf("%s...%s", val[:10], val[len(val)-5:])
-	}
-
-	typ := ""
-	switch t.Typ {
-	case TokenHTML:
-		typ = "HTML"
-	case TokenError:
-		typ = "Error"
-	case TokenIdentifier:
-		typ = "Identifier"
-	case TokenKeyword:
-		typ = "Keyword"
-	case TokenNumber:
-		typ = "Number"
-	case TokenString:
-		typ = "String"
-	case TokenSymbol:
-		typ = "Symbol"
-	case TokenNil:
-		typ = "Nil"
-	default:
-		typ = "Unknown"
-	}
-
-	return fmt.Sprintf("<Token Typ=%s (%d) Val='%s' Line=%d Col=%d, WT=%t>",
-		typ, t.Typ, val, t.Line, t.Col, t.TrimWhitespaces)
-}
+func (t *Token) String() string { _ = "STUB: not implemented"; return "" }
 
 // lex tokenizes the given template source string and returns a slice of tokens.
 // This is the main entry point for lexical analysis.
@@ -249,40 +216,14 @@ func (t *Token) String() string {
 //   - input: The complete template source to tokenize
 //
 // Returns the token slice on success, or an Error with location info on failure.
-func lex(name string, input string) ([]*Token, error) {
-	l := &lexer{
-		name:      name,
-		input:     input,
-		tokens:    make([]*Token, 0, 100),
-		line:      1,
-		col:       1,
-		startline: 1,
-		startcol:  1,
-	}
-	l.run()
-	if l.errored {
-		errtoken := l.tokens[len(l.tokens)-1]
-		return nil, &Error{
-			Filename:  name,
-			Line:      errtoken.Line,
-			Column:    errtoken.Col,
-			Sender:    "lexer",
-			OrigError: errors.New(errtoken.Val),
-		}
-	}
-	return l.tokens, nil
-}
+func lex(name string, input string) ([]*Token, error) { _ = "STUB: not implemented"; return nil, nil }
 
 // value returns the substring of input from start to current position.
 // This is the text content of the token currently being built.
-func (l *lexer) value() string {
-	return l.input[l.start:l.pos]
-}
+func (l *lexer) value() string { _ = "STUB: not implemented"; return "" }
 
 // length returns the byte length of the current token being built.
-func (l *lexer) length() int {
-	return l.pos - l.start
-}
+func (l *lexer) length() int { _ = "STUB: not implemented"; return 0 }
 
 // emit creates a token of the given type from the current lexer state
 // and appends it to the token list. After emitting, the lexer's start
@@ -292,153 +233,64 @@ func (l *lexer) length() int {
 //   - TokenString: Escape sequences are processed (\\, \", \', \n, \t, \r)
 //   - TokenSymbol: Whitespace-trimming symbols ({{-, -}}, {%-, -%}) have
 //     TrimWhitespaces set to true and the "-" is removed from Val
-func (l *lexer) emit(t TokenType) {
-	tok := &Token{
-		Filename: l.name,
-		Typ:      t,
-		Val:      l.value(),
-		Line:     l.startline,
-		Col:      l.startcol,
-	}
+func (l *lexer) emit(t TokenType) { _ = "STUB: not implemented"; return }
 
-	if t == TokenString {
-		// Escape sequences in strings
-		tok.Val = stringEscapeReplacer.Replace(tok.Val)
-	}
-
-	if t == TokenSymbol && len(tok.Val) == 3 && (strings.HasSuffix(tok.Val, "-") || strings.HasPrefix(tok.Val, "-")) {
-		tok.TrimWhitespaces = true
-		tok.Val = strings.ReplaceAll(tok.Val, "-", "")
-	}
-
-	l.tokens = append(l.tokens, tok)
-	l.start = l.pos
-	l.startline = l.line
-	l.startcol = l.col
-}
+// Escape sequences in strings
 
 // next advances the lexer by one rune and returns it.
 // Returns EOF if the end of input has been reached.
 // Updates pos and col to reflect the new position.
 // The width of the rune is stored for use by backup().
-func (l *lexer) next() rune {
-	if l.pos >= len(l.input) {
-		l.width = 0
-		return EOF
-	}
-	r, w := utf8.DecodeRuneInString(l.input[l.pos:])
-	l.width = w
-	l.pos += l.width
-	l.col++
-	return r
-}
+func (l *lexer) next() rune { _ = "STUB: not implemented"; return 0 }
 
 // backup steps back one rune in the input.
 // Can only be called once per call to next().
 // Used to "unread" a character after peeking or when a character
 // doesn't match expected input.
-func (l *lexer) backup() {
-	l.pos -= l.width
-	l.col--
-}
+func (l *lexer) backup() { _ = "STUB: not implemented"; return }
 
 // peek returns the next rune without consuming it.
 // Equivalent to calling next() followed by backup().
-func (l *lexer) peek() rune {
-	r := l.next()
-	l.backup()
-	return r
-}
+func (l *lexer) peek() rune { _ = "STUB: not implemented"; return 0 }
 
 // ignore discards the text from start to the current position.
 // Used to skip over content that shouldn't become a token (e.g., comments).
 // After ignore(), the next emit() will start from the current position.
-func (l *lexer) ignore() {
-	l.start = l.pos
-	l.startline = l.line
-	l.startcol = l.col
-}
+func (l *lexer) ignore() { _ = "STUB: not implemented"; return }
 
 // accept consumes the next rune if it's contained in the valid string.
 // Returns true if a rune was consumed, false otherwise.
 // If false, the lexer position is unchanged.
-func (l *lexer) accept(what string) bool {
-	if strings.ContainsRune(what, l.next()) {
-		return true
-	}
-	l.backup()
-	return false
-}
+func (l *lexer) accept(what string) bool { _ = "STUB: not implemented"; return false }
 
 // acceptRun consumes a run of runes from the valid set.
 // Continues consuming as long as each rune is in the valid string.
 // Stops (and backs up) when a non-matching rune is encountered.
-func (l *lexer) acceptRun(what string) {
-	for strings.ContainsRune(what, l.next()) {
-	}
-	l.backup()
-}
+func (l *lexer) acceptRun(what string) { _ = "STUB: not implemented"; return }
 
 // errorf records a lexical error and terminates the current state.
 // Creates a TokenError with the formatted message and sets the errored flag.
 // Always returns nil to signal that lexing should stop.
 func (l *lexer) errorf(format string, args ...any) lexerStateFn {
-	t := &Token{
-		Filename: l.name,
-		Typ:      TokenError,
-		Val:      fmt.Sprintf(format, args...),
-		Line:     l.startline,
-		Col:      l.startcol,
-	}
-	l.tokens = append(l.tokens, t)
-	l.errored = true
-	l.startline = l.line
-	l.startcol = l.col
-	return nil
+	_ = "STUB: not implemented"
+	return *new(lexerStateFn)
 }
 
 // emitRemainingHTML emits any accumulated HTML content as a TokenHTML.
 // Called before entering a template tag or at end of input to flush
 // any raw HTML that was being collected.
-func (l *lexer) emitRemainingHTML() {
-	if l.pos > l.start {
-		l.emit(TokenHTML)
-	}
-}
+func (l *lexer) emitRemainingHTML() { _ = "STUB: not implemented"; return }
 
 // ignoreSingleLineComment skips over a single-line comment {# ... #}.
 // Comments are not emitted as tokens; they are completely discarded.
 // Reports an error if the comment is not closed or contains a newline.
-func (l *lexer) ignoreSingleLineComment() {
-	if !strings.HasPrefix(l.input[l.pos:], "{#") {
-		return
-	}
+func (l *lexer) ignoreSingleLineComment() { _ = "STUB: not implemented"; return }
 
-	l.emitRemainingHTML()
+// pass '{#'
 
-	l.pos += 2 // pass '{#'
-	l.col += 2
+// pass '#}'
 
-	for {
-		switch l.peek() {
-		case EOF:
-			l.errorf("Single-line comment not closed.")
-			return
-		case '\n':
-			l.errorf("Newline not permitted in a single-line comment.")
-			return
-		}
-
-		if strings.HasPrefix(l.input[l.pos:], "#}") {
-			l.pos += 2 // pass '#}'
-			l.col += 2
-			break
-		}
-
-		l.next()
-	}
-	l.ignore() // ignore whole comment
-}
+// ignore whole comment
 
 // processVerbatimTag handles {% verbatim %} and {% endverbatim %} tags.
 // Content inside verbatim blocks is treated as raw HTML, not parsed as
@@ -447,25 +299,13 @@ func (l *lexer) ignoreSingleLineComment() {
 // TODO: Support verbatim tag names as per Django docs:
 // https://docs.djangoproject.com/en/dev/ref/templates/builtins/#verbatim
 func (l *lexer) processVerbatimTag() {
-	if l.inVerbatim {
-		// end verbatim
-		if strings.HasPrefix(l.input[l.pos:], "{% endverbatim %}") {
-			l.emitRemainingHTML()
-			w := len("{% endverbatim %}")
-			l.pos += w
-			l.col += w
-			l.ignore()
-			l.inVerbatim = false
-		}
-	} else if strings.HasPrefix(l.input[l.pos:], "{% verbatim %}") { // tag
-		l.emitRemainingHTML()
-		l.inVerbatim = true
-		w := len("{% verbatim %}")
-		l.pos += w
-		l.col += w
-		l.ignore()
-	}
+	_ = "STUB: not implemented"
+
+	// end verbatim
+	return
 }
+
+// tag
 
 // run is the main lexer loop that processes the entire input.
 // It iterates through the input, handling verbatim blocks, comments,
@@ -473,117 +313,42 @@ func (l *lexer) processVerbatimTag() {
 // is accumulated and emitted as TokenHTML.
 //
 // The loop terminates when EOF is reached or an error occurs.
-func (l *lexer) run() {
-	for {
-		l.processVerbatimTag()
+func (l *lexer) run() { _ = "STUB: not implemented"; return }
 
-		if !l.inVerbatim {
-			// Ignore single-line comments {# ... #}
-			l.ignoreSingleLineComment()
-			if l.errored {
-				return
-			}
+// Ignore single-line comments {# ... #}
 
-			if strings.HasPrefix(l.input[l.pos:], "{{") || // variable
-				strings.HasPrefix(l.input[l.pos:], "{%") { // tag
-				l.emitRemainingHTML()
-				l.tokenizeTemplateCode()
-				if l.errored {
-					return
-				}
-				continue
-			}
-		}
+// variable
+// tag
 
-		// Advance line and reset column upon new line.
-		switch l.peek() {
-		case '\n':
-			l.line++
-			l.col = 0
-		}
+// Advance line and reset column upon new line.
 
-		// Stop lexing once EOF is reached.
-		if l.next() == EOF {
-			break
-		}
-	}
-
-	l.emitRemainingHTML()
-
-	if l.inVerbatim {
-		l.errorf("verbatim-tag not closed, got EOF.")
-	}
-}
+// Stop lexing once EOF is reached.
 
 // tokenizeTemplateCode runs the state machine to process a single template variable/tag.
 // Called when {{ or {% is encountered to tokenizeTemplateCode the contents. Starts in
 // stateCode and continues until a terminal state (nil) is reached.
-func (l *lexer) tokenizeTemplateCode() {
-	for state := l.stateCode; state != nil; {
-		state = state()
-	}
-}
+func (l *lexer) tokenizeTemplateCode() { _ = "STUB: not implemented"; return }
 
 // stateCode is the main state for tokenizing inside template tags.
 // It handles whitespace, identifies the start of identifiers, numbers,
 // strings, and symbols, and dispatches to the appropriate sub-state.
 //
 // Returns nil when a closing delimiter (}}, %}. -}}, -%}) is encountered.
-func (l *lexer) stateCode() lexerStateFn {
-outer_loop:
-	for {
-		switch {
-		case l.accept(tokenSpaceChars):
-			if l.value() == "\n" {
-				return l.errorf("Newline not allowed within tag/variable.")
-			}
-			l.ignore()
-			continue
-		case l.accept(tokenIdentifierChars):
-			return l.stateIdentifier
-		case l.accept(tokenDigits):
-			return l.stateNumber
-		case l.accept(`"'`):
-			return l.stateString
-		}
+func (l *lexer) stateCode() lexerStateFn { _ = "STUB: not implemented"; return *new(lexerStateFn) }
 
-		// Check for symbol
-		for _, sym := range TokenSymbols {
-			if strings.HasPrefix(l.input[l.start:], sym) {
-				l.pos += len(sym)
-				l.col += l.length()
-				l.emit(TokenSymbol)
+// Check for symbol
 
-				if sym == "%}" || sym == "-%}" || sym == "}}" || sym == "-}}" {
-					// Tag/variable end, return after emit
-					return nil
-				}
+// Tag/variable end, return after emit
 
-				continue outer_loop
-			}
-		}
-
-		break
-	}
-
-	// Normal shut down
-	return nil
-}
+// Normal shut down
 
 // stateIdentifier lexes an identifier or keyword token.
 // Called after the first identifier character has been accepted.
 // Consumes remaining identifier characters, then checks if the result
 // is a keyword (emits TokenKeyword) or regular identifier (emits TokenIdentifier).
 func (l *lexer) stateIdentifier() lexerStateFn {
-	l.acceptRun(tokenIdentifierChars)
-	l.acceptRun(tokenIdentifierCharsWithDigits)
-	val := l.value()
-	if _, isKeyword := tokenKeywordsMap[val]; isKeyword {
-		l.emit(TokenKeyword)
-		return l.stateCode
-	}
-	l.emit(TokenIdentifier)
-	return l.stateCode
+	_ = "STUB: not implemented"
+	return *new(lexerStateFn)
 }
 
 // stateNumber lexes a numeric literal token.
@@ -595,60 +360,32 @@ func (l *lexer) stateIdentifier() lexerStateFn {
 // Expressions like "user.0" use the dot as an access operator, and
 // floating-point comparisons like "score >= 8.5" would need context-sensitive
 // parsing to distinguish from property access.
-func (l *lexer) stateNumber() lexerStateFn {
-	l.acceptRun(tokenDigits)
-	if l.accept(tokenIdentifierCharsWithDigits) {
-		// This seems to be an identifier starting with a number.
-		// See https://github.com/flosch/pongo2/issues/151
-		return l.stateIdentifier()
-	}
-	/*
-		Maybe context-sensitive number lexing?
-		* comments.0.Text // first comment
-		* usercomments.1.0 // second user, first comment
-		* if (score >= 8.5) // 8.5 as a number
+func (l *lexer) stateNumber() lexerStateFn { _ = "STUB: not implemented"; return *new(lexerStateFn) }
 
-		if l.peek() == '.' {
-			l.accept(".")
-			if !l.accept(tokenDigits) {
-				return l.errorf("Malformed number.")
-			}
-			l.acceptRun(tokenDigits)
+// This seems to be an identifier starting with a number.
+// See https://github.com/flosch/pongo2/issues/151
+
+/*
+	Maybe context-sensitive number lexing?
+	* comments.0.Text // first comment
+	* usercomments.1.0 // second user, first comment
+	* if (score >= 8.5) // 8.5 as a number
+
+	if l.peek() == '.' {
+		l.accept(".")
+		if !l.accept(tokenDigits) {
+			return l.errorf("Malformed number.")
 		}
-	*/
-	l.emit(TokenNumber)
-	return l.stateCode
-}
+		l.acceptRun(tokenDigits)
+	}
+*/
 
 // stateString lexes a quoted string literal.
 // Called after the opening quote (single or double) has been accepted.
 // Handles escape sequences: \\, \", \', \n, \t, \r.
 // Reports errors for unclosed strings, unknown escapes, or embedded newlines.
-func (l *lexer) stateString() lexerStateFn {
-	quotationMark := l.value()
-	l.ignore()
-	l.startcol-- // we're starting the position at the first "
-	for !l.accept(quotationMark) {
-		switch l.next() {
-		case '\\':
-			// escape sequence
-			switch l.peek() {
-			case '"', '\'', '\\', 'n', 't', 'r':
-				l.next()
-			default:
-				return l.errorf("Unknown escape sequence: \\%c", l.peek())
-			}
-		case EOF:
-			return l.errorf("Unexpected EOF, string not closed.")
-		case '\n':
-			return l.errorf("Newline in string is not allowed.")
-		}
-	}
-	l.backup()
-	l.emit(TokenString)
+func (l *lexer) stateString() lexerStateFn { _ = "STUB: not implemented"; return *new(lexerStateFn) }
 
-	l.next()
-	l.ignore()
+// we're starting the position at the first "
 
-	return l.stateCode
-}
+// escape sequence

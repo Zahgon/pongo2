@@ -1,12 +1,5 @@
 package pongo2
 
-import (
-	"bufio"
-	"fmt"
-	"io"
-	"os"
-)
-
 // The Error type is being used to address an error during lexing, parsing or
 // execution. If you want to return an error object (for example in your own
 // tag or filter) fill this object with as much information as you have.
@@ -26,108 +19,34 @@ type Error struct {
 // updateFromTokenIfNeeded updates the error with template and token information
 // if they haven't been set yet. This helps provide better error location context.
 func (e *Error) updateFromTokenIfNeeded(template *Template, t *Token) *Error {
-	if e.Template == nil {
-		e.Template = template
-	}
-
-	if e.Token == nil {
-		e.Token = t
-		if e.Line <= 0 {
-			e.Line = t.Line
-			e.Column = t.Col
-		}
-	}
-
-	return e
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // updateErrorToken is a helper that updates token info on a *Error if the error
 // is of that type, otherwise returns the error as-is.
 func updateErrorToken(err error, template *Template, t *Token) error {
-	if err == nil {
-		return nil
-	}
-	if e, ok := err.(*Error); ok {
-		return e.updateFromTokenIfNeeded(template, t)
-	}
-	return err
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // Unwrap returns the underlying error for use with errors.Is and errors.As.
 func (e *Error) Unwrap() error {
-	return e.OrigError
+	_ = "STUB: not implemented"
+
+	// Returns a nice formatted error string.
+	return nil
 }
 
-// Returns a nice formatted error string.
-func (e *Error) Error() string {
-	s := "[Error"
-	if e.Sender != "" {
-		s += " (where: " + e.Sender + ")"
-	}
-	if e.Filename != "" {
-		s += " in " + e.Filename
-	}
-	if e.Line > 0 {
-		s += fmt.Sprintf(" | Line %d Col %d", e.Line, e.Column)
-		if e.Token != nil {
-			s += fmt.Sprintf(" near '%s'", e.Token.Val)
-		}
-	}
-	s += "] "
-	s += e.OrigError.Error()
-	return s
-}
+func (e *Error) Error() string { _ = "STUB: not implemented"; return "" }
 
 // RawLine returns the affected line from the original template, if available.
 func (e *Error) RawLine() (line string, available bool, outErr error) {
-	if e.Line <= 0 || e.Filename == "<string>" {
-		return "", false, nil
-	}
-
-	filename := e.Filename
-	if e.Template != nil {
-		filename = e.Template.set.resolveFilename(e.Template, e.Filename)
-	}
-
-	// Try to get the file through the template's loader first (supports fs.FS),
-	// falling back to os.Open for backwards compatibility
-	var reader io.Reader
-	if e.Template != nil && e.Template.set != nil {
-		_, _, fd, err := e.Template.set.resolveTemplate(e.Template, e.Filename)
-		if err == nil {
-			reader = fd
-			// If reader implements io.Closer, ensure we close it
-			if closer, ok := reader.(io.Closer); ok {
-				defer func() {
-					err := closer.Close()
-					if err != nil && outErr == nil {
-						outErr = err
-					}
-				}()
-			}
-		}
-	}
-	if reader == nil {
-		file, err := os.Open(filename)
-		if err != nil {
-			return "", false, err
-		}
-		defer func() {
-			err := file.Close()
-			if err != nil && outErr == nil {
-				outErr = err
-			}
-		}()
-		reader = file
-	}
-
-	scanner := bufio.NewScanner(reader)
-	l := 0
-	for scanner.Scan() {
-		l++
-		if l == e.Line {
-			return scanner.Text(), true, nil
-		}
-	}
+	_ = "STUB: not implemented"
 	return "", false, nil
 }
+
+// Try to get the file through the template's loader first (supports fs.FS),
+// falling back to os.Open for backwards compatibility
+
+// If reader implements io.Closer, ensure we close it

@@ -33,26 +33,19 @@ type tagCommentNode struct{}
 // Execute is a no-op for comment nodes. The content between {% comment %}
 // and {% endcomment %} is completely ignored and never rendered.
 func (node *tagCommentNode) Execute(ctx *ExecutionContext, writer TemplateWriter) error {
+	_ = "STUB: not implemented"
+
+	// tagCommentParser parses the {% comment %} tag. It skips all content
+	// until {% endcomment %} and does not accept any arguments.
 	return nil
 }
 
-// tagCommentParser parses the {% comment %} tag. It skips all content
-// until {% endcomment %} and does not accept any arguments.
 func tagCommentParser(doc *Parser, start *Token, arguments *Parser) (INodeTag, error) {
-	commentNode := &tagCommentNode{}
-
-	// TODO: Process the endtag's arguments (see django 'comment'-tag documentation)
-	err := doc.SkipUntilTag("endcomment")
-	if err != nil {
-		return nil, err
-	}
-
-	if arguments.Count() != 0 {
-		return nil, arguments.Error("Tag 'comment' does not take any argument.", nil)
-	}
-
-	return commentNode, nil
+	_ = "STUB: not implemented"
+	return *new(INodeTag), nil
 }
+
+// TODO: Process the endtag's arguments (see django 'comment'-tag documentation)
 
 func init() {
 	mustRegisterTag("comment", tagCommentParser)

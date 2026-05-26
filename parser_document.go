@@ -2,58 +2,16 @@ package pongo2
 
 // Doc = { ( Filter | Tag | HTML ) }
 func (p *Parser) parseDocElement() (INode, error) {
-	t := p.Current()
-
-	switch t.Typ {
-	case TokenHTML:
-		n := &nodeHTML{token: t}
-		left := p.PeekTypeN(-1, TokenSymbol)
-		right := p.PeekTypeN(1, TokenSymbol)
-		n.trimLeft = left != nil && left.TrimWhitespaces
-		n.trimRight = right != nil && right.TrimWhitespaces
-		p.Consume() // consume HTML element
-		return n, nil
-	case TokenSymbol:
-		switch t.Val {
-		case "{{":
-			// parse variable
-			variable, err := p.parseVariableElement()
-			if err != nil {
-				return nil, err
-			}
-			return variable, nil
-		case "{%":
-			// parse tag
-			tag, err := p.parseTagElement()
-			if err != nil {
-				return nil, err
-			}
-			return tag, nil
-		}
-	}
-	return nil, p.Error("Unexpected token (only HTML/tags/filters in templates allowed)", t)
+	_ = "STUB: not implemented"
+	return *new(INode), nil
 }
 
-func (tpl *Template) parse() error {
-	parser := newParser(tpl.name, tpl.tokens, tpl)
-	doc, err := parser.parseDocument()
-	if err != nil {
-		return err
-	}
-	tpl.root = doc
-	return nil
-}
+// consume HTML element
 
-func (p *Parser) parseDocument() (*nodeDocument, error) {
-	doc := &nodeDocument{}
+// parse variable
 
-	for p.Remaining() > 0 {
-		node, err := p.parseDocElement()
-		if err != nil {
-			return nil, err
-		}
-		doc.Nodes = append(doc.Nodes, node)
-	}
+// parse tag
 
-	return doc, nil
-}
+func (tpl *Template) parse() error { _ = "STUB: not implemented"; return nil }
+
+func (p *Parser) parseDocument() (*nodeDocument, error) { _ = "STUB: not implemented"; return nil, nil }
